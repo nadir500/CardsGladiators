@@ -33,7 +33,7 @@ public class DeckController : MonoBehaviour
 
     public CardDataModel DrawCard()
     {
-        int cardIndex = _deckDataModel.deckTotal ;
+        int cardIndex = _deckDataModel.deckTotal;
 
         _deckDataModel.deckTotal--;
         return _deckDataModel.cardsArray[cardIndex];
@@ -98,26 +98,34 @@ public class DeckController : MonoBehaviour
         {
             turn = Turn.Player;
         }
+
         if (turn == Turn.Player)
         {
             turn = Turn.Enemy;
         }
     }
 
-    public void AttackTurn(List<CardDataModel> cardDataModelArray , Turn turn)
+    public void AttackTurn(List<CardDataModel> cardDataModelArray, Turn turn)
     {
-        int attackResult =0 ; 
+        int attackResult = 0;
+        int currentHealth = 0;
         for (int i = 0; i < cardDataModelArray.Count; i++)
         {
             attackResult += cardDataModelArray[i].cardNumberValue;
         }
+
         if (turn == Turn.Player)
         {
-            _enemyHealth.text = attackResult.ToString(); 
+            currentHealth = int.Parse(_enemyHealth.text);
+            currentHealth -= attackResult;
+            _enemyHealth.text = currentHealth.ToString();
         }
         else
         {
-            _playerHealth.text = attackResult.ToString(); 
+            currentHealth = int.Parse(_playerHealth.text);
+            currentHealth -= attackResult;
+
+            _playerHealth.text = currentHealth.ToString();
         }
     }
 }

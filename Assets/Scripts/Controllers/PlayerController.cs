@@ -132,6 +132,7 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(2.0f);
         _deckController.AttackTurn(playerDataModel.heldCards, turn);
+        FlushCards(playerDataModel,turn);
     }
 
     IEnumerator DrawCard(PlayerDataModel playerDataModel, Turn turn)
