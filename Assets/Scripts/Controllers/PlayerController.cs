@@ -67,6 +67,8 @@ public class PlayerController : MonoBehaviour
 
     private void PlayTurn(Turn turn)
     {
+        //check if someone won 
+
         // CardDataModel drawnCard = _deckController.DrawCard();
         if (turn == Turn.Player)
         {
@@ -86,6 +88,11 @@ public class PlayerController : MonoBehaviour
 
             //start competing 
             EnemyMove();
+        }
+
+        if (_playerCards.heldCards.Count == 0 && _enemyCards.heldCards.Count ==0 && _deckController._deckDataModel.deckTotal ==0  )
+        {
+            _deckController.CheckGameStatus();
         }
     }
 
@@ -110,7 +117,9 @@ public class PlayerController : MonoBehaviour
     private void EnemyMove()
     {
         //draw 
-        int makeMove = Random.Range(0, 1); //draw or not draw 
+        int makeMove = Mathf.RoundToInt(Random.value); //draw or not draw 
+
+        Debug.Log("enemy move " + makeMove);
         if (makeMove == 1)
         {
             StartCoroutine(DrawCard(_enemyCards, Turn.Enemy));
@@ -140,23 +149,31 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(3.0f);
 
         CardDataModel cardData = _deckController.DrawCard();
+
         _enemyCards.heldCards.Add(cardData);
-        InstanceCard(cardData, Turn.Player);
+        InstanceCard(cardData, turn);
         //check if the draw card same color or another color 
         //if another color the cards will be ditched and he's ending his turn [player]
-        if (_enemyCards.heldCards[_enemyCards.heldCards.Count - 2].cardsColor ==
-            _enemyCards.heldCards[_enemyCards.heldCards.Count - 1].cardsColor)
+        if (_enemyCards.heldCards.Count < 2)
         {
             EnemyMove();
         }
         else
         {
-            //flush the cards into the graveyard 
-            yield return new WaitForSeconds(2.0f);
-            FlushCards(_enemyCards, Turn.Enemy);
-            //end turn 
-            EndTurnEnemy();
-            yield return null;
+            if (_enemyCards.heldCards[_enemyCards.heldCards.Count - 2].cardsColor ==
+                cardData.cardsColor)
+            {
+                EnemyMove();
+            }
+            else
+            {
+                //flush the cards into the graveyard 
+                yield return new WaitForSeconds(2.0f);
+                FlushCards(_enemyCards, Turn.Enemy);
+                //end turn 
+                EndTurnEnemy();
+                yield return null;
+            }
         }
     }
 
@@ -169,14 +186,13 @@ public class PlayerController : MonoBehaviour
         }
 
         FlushCards(_playerCards, Turn.Player);
-        PlayTurn(_turn);
+        PlayTurn(Turn.Enemy);
     }
 
     private void AttackButton()
     {
         StartCoroutine(Attack(_playerCards, Turn.Player));
         _playerInteractButtons[1].interactable = false;
-        FlushCards(_playerCards, Turn.Player);
     }
 
     private void DrawCardButton()
@@ -229,6 +245,6 @@ public class PlayerController : MonoBehaviour
             _playerInteractButtons[i].interactable = true;
         }
 
-        PlayTurn(_turn);
+        PlayTurn(Turn.Player);
     }
 }

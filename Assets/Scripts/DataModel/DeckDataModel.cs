@@ -16,10 +16,10 @@ public class DeckDataModel
 
     public DeckDataModel(int _deckTotal, Turn _playerTurn)
     {
-        deckTotal = _deckTotal - 1;
+        deckTotal = _deckTotal ;
         playerTurn = _playerTurn;
-        cardsArray = new CardDataModel[deckTotal + 1];
-        for (int i = 0; i < deckTotal + 1; i++)
+        cardsArray = new CardDataModel[deckTotal ];
+        for (int i = 0; i < deckTotal ; i++)
         {
             //generate cards New cards(); 
             cardsArray[i] = new CardDataModel((CardsShapes) Random.Range(0, 3), Random.Range(1, 13),

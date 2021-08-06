@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class DeckController : MonoBehaviour
 {
     // Start is called before the first frame update
-    private DeckDataModel _deckDataModel;
+    public DeckDataModel _deckDataModel;
     [SerializeField] private Text _cardsTextContainer;
     [SerializeField] private Text _playerHealth;
     [SerializeField] private Text _enemyHealth;
@@ -19,11 +19,11 @@ public class DeckController : MonoBehaviour
 
     private void Initialize()
     {
-        _deckDataModel = new DeckDataModel(13, Turn.Player);
+        _deckDataModel = new DeckDataModel(5, Turn.Player);
         for (int i = 0; i < _deckDataModel.cardsArray.Length; i++)
         {
 //            Debug.Log("Cards Array " + _deckDataModel.cardsArray[i].cardShapes.ToString() + " " +
-                   //   _deckDataModel.cardsArray[i].cardNumberValue + " " + _deckDataModel.cardsArray[i].cardsColor);
+            //   _deckDataModel.cardsArray[i].cardNumberValue + " " + _deckDataModel.cardsArray[i].cardsColor);
         }
 
         _cardsTextContainer.text = _deckDataModel.deckTotal.ToString();
@@ -36,7 +36,7 @@ public class DeckController : MonoBehaviour
         int cardIndex = _deckDataModel.deckTotal;
 
         _deckDataModel.deckTotal--;
-        return _deckDataModel.cardsArray[cardIndex];
+        return _deckDataModel.cardsArray[cardIndex - 1];
     }
 
     public void ExecuteAttack(CardDataModel[] cards, Turn turn)
@@ -126,6 +126,28 @@ public class DeckController : MonoBehaviour
             currentHealth -= attackResult;
 
             _playerHealth.text = currentHealth.ToString();
+        }
+    }
+
+    public void CheckGameStatus()
+    {
+        int playerScore = 0;
+        int enemyScore = 0;
+
+        playerScore = int.Parse(_playerHealth.text);
+        enemyScore = int.Parse(_enemyHealth.text);
+        Debug.Log("cards length " + _deckDataModel.deckTotal);
+        if (_deckDataModel.deckTotal ==0 )
+        {
+            if (playerScore > enemyScore)
+            {
+                _cardsTextContainer.text = "PLAYER WON!";
+            }
+            else
+            {
+                _cardsTextContainer.text = "ENEMY WON!";
+            }
+            
         }
     }
 }
