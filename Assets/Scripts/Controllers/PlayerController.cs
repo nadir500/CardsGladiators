@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour
 
     private void PlayTurn(Turn turn)
     {
-       // CardDataModel drawnCard = _deckController.DrawCard();
+        // CardDataModel drawnCard = _deckController.DrawCard();
         if (turn == Turn.Player)
         {
             //player logic 
@@ -132,7 +132,7 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(2.0f);
         _deckController.AttackTurn(playerDataModel.heldCards, turn);
-        FlushCards(playerDataModel,turn);
+        FlushCards(playerDataModel, turn);
     }
 
     IEnumerator DrawCard(PlayerDataModel playerDataModel, Turn turn)
@@ -168,7 +168,7 @@ public class PlayerController : MonoBehaviour
             _playerInteractButtons[i].interactable = false;
         }
 
-        FlushCards(_playerCards,Turn.Player);
+        FlushCards(_playerCards, Turn.Player);
         PlayTurn(_turn);
     }
 
@@ -176,7 +176,7 @@ public class PlayerController : MonoBehaviour
     {
         StartCoroutine(Attack(_playerCards, Turn.Player));
         _playerInteractButtons[1].interactable = false;
-        FlushCards(_playerCards,Turn.Player);
+        FlushCards(_playerCards, Turn.Player);
     }
 
     private void DrawCardButton()
@@ -184,17 +184,20 @@ public class PlayerController : MonoBehaviour
         CardDataModel cardData = _deckController.DrawCard();
         _playerCards.heldCards.Add(cardData);
         InstanceCard(cardData, Turn.Player);
+        Debug.Log("player held length " + _playerCards.heldCards.Count);
         //check if the draw card same color or another color 
         //if another color the cards will be ditched and he's ending his turn [player]
-        if (_playerCards.heldCards[_playerCards.heldCards.Count - 2].cardsColor ==
-            _playerCards.heldCards[_playerCards.heldCards.Count - 1].cardsColor)
+        if (_playerCards.heldCards.Count > 1)
         {
-            _playerInteractButtons[2].interactable = true;
-        }
-        else
-        {
-            _playerInteractButtons[1].interactable = false;
-            _playerInteractButtons[2].interactable = false;
+            if (_playerCards.heldCards[_playerCards.heldCards.Count - 2].cardsColor == cardData.cardsColor)
+            {
+                _playerInteractButtons[2].interactable = true;
+            }
+            else
+            {
+                _playerInteractButtons[1].interactable = false;
+                _playerInteractButtons[2].interactable = false;
+            }
         }
     }
 

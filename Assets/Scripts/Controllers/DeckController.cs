@@ -22,8 +22,8 @@ public class DeckController : MonoBehaviour
         _deckDataModel = new DeckDataModel(13, Turn.Player);
         for (int i = 0; i < _deckDataModel.cardsArray.Length; i++)
         {
-            Debug.Log("Cards Array " + _deckDataModel.cardsArray[i].cardShapes.ToString() + " " +
-                      _deckDataModel.cardsArray[i].cardNumberValue + " " + _deckDataModel.cardsArray[i].cardsColor);
+//            Debug.Log("Cards Array " + _deckDataModel.cardsArray[i].cardShapes.ToString() + " " +
+                   //   _deckDataModel.cardsArray[i].cardNumberValue + " " + _deckDataModel.cardsArray[i].cardsColor);
         }
 
         _cardsTextContainer.text = _deckDataModel.deckTotal.ToString();
