@@ -11,7 +11,7 @@ public class DeckController : MonoBehaviour
     [SerializeField] private Text _cardsTextContainer;
     [SerializeField] private Text _playerHealth;
     [SerializeField] private Text _enemyHealth;
-
+    [SerializeField] private int deckTotalValue = 5; 
     void Awake()
     {
         Initialize();
@@ -19,7 +19,7 @@ public class DeckController : MonoBehaviour
 
     private void Initialize()
     {
-        _deckDataModel = new DeckDataModel(5, Turn.Player);
+        _deckDataModel = new DeckDataModel(deckTotalValue, Turn.Player);
         for (int i = 0; i < _deckDataModel.cardsArray.Length; i++)
         {
 //            Debug.Log("Cards Array " + _deckDataModel.cardsArray[i].cardShapes.ToString() + " " +
@@ -36,6 +36,7 @@ public class DeckController : MonoBehaviour
         int cardIndex = _deckDataModel.deckTotal;
 
         _deckDataModel.deckTotal--;
+        _cardsTextContainer.text = _deckDataModel.deckTotal.ToString();
         return _deckDataModel.cardsArray[cardIndex - 1];
     }
 
