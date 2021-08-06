@@ -1,7 +1,7 @@
- using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
- using UnityEngine;
- using UnityEngine.UI;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -31,20 +31,21 @@ public class PlayerController : MonoBehaviour
         {
             _playerInteractButtons[i].interactable = false;
         }
+
         _playerInteractButtons[0].onClick.AddListener(EndTurnButton);
         _playerInteractButtons[1].onClick.AddListener(AttackButton);
         _playerInteractButtons[2].onClick.AddListener(DrawCardButton);
-        
+
         Initialize();
     }
 
     private void Initialize()
     {
         Debug.Log("Init cards draw request");
-        
+
         _playerCards.heldCards.Add(_deckController.DrawCard());
         InstanceCard(_playerCards.heldCards[0], Turn.Player);
-        
+
         Debug.Log("card player drawn ");
         _enemyCards.heldCards.Add(_deckController.DrawCard());
         InstanceCard(_enemyCards.heldCards[0], Turn.Enemy);
@@ -66,15 +67,13 @@ public class PlayerController : MonoBehaviour
 
     private void PlayTurn(Turn turn)
     {
-        CardDataModel drawnCard = _deckController.DrawCard();
+       // CardDataModel drawnCard = _deckController.DrawCard();
         if (turn == Turn.Player)
         {
             //player logic 
             _playerInteractButtons[0].interactable = true; //end turn
             _playerInteractButtons[1].interactable = true; //attack 
             _playerInteractButtons[2].interactable = true; //draw card 
-            
-            
         }
         else
         {
@@ -82,11 +81,11 @@ public class PlayerController : MonoBehaviour
             _playerInteractButtons[0].interactable = false; //end turn
             _playerInteractButtons[1].interactable = false;
             _playerInteractButtons[2].interactable = false;
-            
+
             // _enemyCards.heldCards.Add(drawnCard);
 
             //start competing 
-            
+            EnemyMove();
         }
     }
 
@@ -112,18 +111,21 @@ public class PlayerController : MonoBehaviour
     {
         //draw 
         int makeMove = Random.Range(0, 1); //draw or not draw 
-        if (makeMove == 1 )
+        if (makeMove == 1)
         {
-            StartCoroutine(DrawCard(_enemyCards,Turn.Enemy));
-            
+            StartCoroutine(DrawCard(_enemyCards, Turn.Enemy));
         }
         else
         {
-        //attack
-            
+            if (makeMove == 0)
+            {
+                //attack
+                StartCoroutine(Attack(_enemyCards, Turn.Enemy));
+            }
         }
 
         //end turn 
+        EndTurnEnemy();
     }
 
     IEnumerator Attack(PlayerDataModel playerDataModel, Turn turn)
@@ -135,48 +137,56 @@ public class PlayerController : MonoBehaviour
     IEnumerator DrawCard(PlayerDataModel playerDataModel, Turn turn)
     {
         yield return new WaitForSeconds(3.0f);
-        
+
         CardDataModel cardData = _deckController.DrawCard();
         _enemyCards.heldCards.Add(cardData);
-        InstanceCard(cardData,Turn.Player);
+        InstanceCard(cardData, Turn.Player);
         //check if the draw card same color or another color 
         //if another color the cards will be ditched and he's ending his turn [player]
-        if(_enemyCards.heldCards[_enemyCards.heldCards.Count -2 ].cardsColor ==  _enemyCards.heldCards[_enemyCards.heldCards.Count -1].cardsColor)
+        if (_enemyCards.heldCards[_enemyCards.heldCards.Count - 2].cardsColor ==
+            _enemyCards.heldCards[_enemyCards.heldCards.Count - 1].cardsColor)
         {
-            
+            EnemyMove();
         }
         else
         {
             //flush the cards into the graveyard 
-            
+            yield return new WaitForSeconds(2.0f);
+            FlushCards(_enemyCards, Turn.Enemy);
+            //end turn 
+            EndTurnEnemy();
             yield return null;
         }
     }
+
     private void EndTurnButton()
     {
         _turn = Turn.Enemy;
         for (int i = 0; i < _playerInteractButtons.Length; i++)
         {
-            _playerInteractButtons[i].interactable = false; 
+            _playerInteractButtons[i].interactable = false;
         }
+
+        FlushCards(_playerCards,Turn.Player);
         PlayTurn(_turn);
     }
 
     private void AttackButton()
     {
         StartCoroutine(Attack(_playerCards, Turn.Player));
-        _playerInteractButtons[1].interactable = false; 
-
+        _playerInteractButtons[1].interactable = false;
+        FlushCards(_playerCards,Turn.Player);
     }
 
     private void DrawCardButton()
     {
         CardDataModel cardData = _deckController.DrawCard();
         _playerCards.heldCards.Add(cardData);
-        InstanceCard(cardData,Turn.Player);
+        InstanceCard(cardData, Turn.Player);
         //check if the draw card same color or another color 
         //if another color the cards will be ditched and he's ending his turn [player]
-        if(_playerCards.heldCards[_playerCards.heldCards.Count -2 ].cardsColor ==  _playerCards.heldCards[_playerCards.heldCards.Count -1].cardsColor)
+        if (_playerCards.heldCards[_playerCards.heldCards.Count - 2].cardsColor ==
+            _playerCards.heldCards[_playerCards.heldCards.Count - 1].cardsColor)
         {
             _playerInteractButtons[2].interactable = true;
         }
@@ -187,8 +197,34 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void FlushCards(PlayerDataModel playerDataModel)
+    private void FlushCards(PlayerDataModel playerDataModel, Turn turn)
     {
-        
+        playerDataModel.heldCards = new List<CardDataModel>();
+        if (turn == Turn.Player)
+        {
+            //flush player cards 
+            for (int i = 0; i < _playerCardsPanel.transform.childCount; i++)
+            {
+                Destroy(_playerCardsPanel.transform.GetChild(i).gameObject);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < _enemyCardsPanel.transform.childCount; i++)
+            {
+                Destroy(_enemyCardsPanel.transform.GetChild(i).gameObject);
+            }
+        }
+    }
+
+    private void EndTurnEnemy()
+    {
+        _turn = Turn.Player;
+        for (int i = 0; i < _playerInteractButtons.Length; i++)
+        {
+            _playerInteractButtons[i].interactable = true;
+        }
+
+        PlayTurn(_turn);
     }
 }
